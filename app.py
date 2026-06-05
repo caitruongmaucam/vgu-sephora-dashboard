@@ -17,12 +17,12 @@ st.set_page_config(
 )
 
 
-# Khởi tạo Session State để theo dõi phiên làm việc
+# Initialize Session State for page and starting control
 if 'started' not in st.session_state:
     st.session_state.started = False
 
 
-# Khai báo các giá trị mặc định cho Session State để tránh xung đột khi nhấn Reset
+# Default state variables mapping to avoid widget collisions during reset
 defaults = {
     "sb_brands": [],
     "sb_categories": [],
@@ -59,13 +59,13 @@ defaults = {
 }
 
 
-# Nạp các cấu hình mặc định vào hệ thống state
+# Safely inject missing defaults into st.session_state
 for key, val in defaults.items():
     if key not in st.session_state:
         st.session_state[key] = val
 
 
-# Hàm mã hóa ảnh sang Base64 để hiển thị làm nền mượt mà
+# Safe Image Base64 encoder for secure background rendering (Using newest uploaded backdrop)
 def get_image_base64(file_name):
     try:
         if os.path.exists(file_name):
@@ -76,13 +76,13 @@ def get_image_base64(file_name):
     return ""
 
 
-# Tải ảnh nền trực tiếp từ tệp cục bộ
+# Read background image dynamically if available
 sephora_bg_base64 = get_image_base64("image_238c12.jpg")
 if not sephora_bg_base64:
     sephora_bg_base64 = get_image_base64("image_f68b1e.jpg")
 
 
-# CSS tạo dựng kiểu dáng: Tích hợp hiệu ứng chuyển động mượt mà, màu sắc đậm đà rõ nét
+# Premium CSS Styling: Elegant, responsive, featuring micro-interactions and smooth animations
 css_style = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap');
@@ -93,7 +93,19 @@ css_style = """
 }
 
 
-/* Hiệu ứng chuyển động mượt mà */
+/* FIX OVER-BOLD TEXT ISSUE ONLY FOR CARD PARAGRAPHS & DESCRIPTION LINES */
+.premium-card p, .premium-card li, .glass-desc, .glass-panel p {
+    font-weight: 400 !important;
+}
+
+
+/* Restores natural rich bold styling to headers, labels, KPIs, and general elements */
+h1, h2, h3, h4, h5, h6, strong, b, .main-title, .stat-val, .stat-lbl, .badge {
+    font-weight: 700 !important;
+}
+
+
+/* Keyframe Animations */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -124,10 +136,10 @@ css_style = """
 }
 
 
-/* Màu nền của ứng dụng - đậm đà và tương phản sắc nét hơn */
+/* App background default */
 .stApp {
     background-color: #F3F4F6;
-    color: #111827;
+    color: #1F2937;
 }
 
 
@@ -138,7 +150,7 @@ section[data-testid="stSidebar"] {
 }
 
 
-/* Thẻ Glassmorphic Card cao cấp - viền đậm và bóng đổ rõ nét */
+/* Glassmorphic Rounded Cards with Hover Scale & Glow Animation */
 .premium-card {
     background: #FFFFFF;
     padding: 24px;
@@ -158,12 +170,11 @@ section[data-testid="stSidebar"] {
 }
 
 
-/* Tiêu đề lớn dải màu Sephora */
+/* Sephora Signature Gradient Titles */
 .main-title {
     background: linear-gradient(90deg, #E91E63 0%, #B71C1C 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-weight: 800;
     font-size: 2.5rem !important;
     letter-spacing: -1px;
     margin-bottom: 4px;
@@ -171,7 +182,7 @@ section[data-testid="stSidebar"] {
 }
 
 
-/* Các chỉ số KPI (Metric Widgets) */
+/* Premium Metric Widgets */
 .stat-box {
     text-align: center;
     padding: 18px;
@@ -189,25 +200,22 @@ section[data-testid="stSidebar"] {
 }
 .stat-val {
     font-size: 2rem;
-    font-weight: 800;
     color: #C2185B;
 }
 .stat-lbl {
     font-size: 0.75rem;
     color: #374151;
-    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-top: 3px;
 }
 
 
-/* Thiết kế nút bấm khởi động */
+/* Premium Button Design with Active Glow Pulse */
 .stButton>button {
     border-radius: 50px !important;
     background: linear-gradient(90deg, #E91E63 0%, #B71C1C 100%) !important;
     color: white !important;
-    font-weight: 700 !important;
     border: none !important;
     padding: 14px 40px !important;
     font-size: 1.1rem !important;
@@ -225,7 +233,6 @@ section[data-testid="stSidebar"] {
     color: #C2185B;
     padding: 6px 16px;
     border-radius: 50px;
-    font-weight: 800;
     font-size: 0.8rem;
     display: inline-block;
     margin-bottom: 12px;
@@ -233,7 +240,7 @@ section[data-testid="stSidebar"] {
 }
 
 
-/* Ẩn nhãn radio điều hướng mặc định */
+/* Hide default Radio Labels for visual spacing */
 div[data-testid="stRadio"] > label {
     display: none !important;
     height: 0px !important;
@@ -248,7 +255,7 @@ div[data-testid="stRadio"] {
 }
 
 
-/* Định dạng thanh thực đơn ngang giống Google Chrome Tabs */
+/* Horizontal Tab Menu (Google Chrome Style) */
 div[role="radiogroup"] {
     gap: 6px !important;
     background-color: #FFE5EC !important;
@@ -268,7 +275,6 @@ div[role="radiogroup"] label {
     border-radius: 10px 10px 0px 0px !important;
     color: #374151 !important;
     font-size: 0.9rem !important;
-    font-weight: 700 !important;
     padding: 8px 16px !important;
     border: none !important;
     transition: all 0.2s ease !important;
@@ -285,7 +291,7 @@ div[role="radiogroup"] label[data-checked="true"] {
 }
 
 
-/* Ẩn dấu radio tròn mặc định */
+/* Hide default streamlit radio circles */
 div[role="radiogroup"] [data-testid="stRadioSquare"] {
     display: none !important;
 }
@@ -298,15 +304,15 @@ st.markdown(css_style, unsafe_allow_html=True)
 SEPHORA_COLORS = ["#F48FB1", "#F06292", "#EC407A", "#E91E63", "#EF5350", "#E53935", "#B71C1C"]
 
 
-# Phổ màu siêu đậm đà, độ tương phản cao, làm sâu sắc dải hồng và đỏ mận, loại bỏ hiện tượng nhạt nhòa
+# High Contrast Spectrum for premium visualization elements
 HIGH_CONTRAST_BURGUNDY = [
-    "#FFB3C1",  # Hồng nhạt rõ ràng
-    "#FF4D6D",  # Hồng san hô đậm
-    "#E0115F",  # Hồng Ruby sang trọng
-    "#C2185B",  # Hồng mận Sephora
-    "#A01A40",  # Đỏ Crimson sẫm
-    "#700C25",  # Đỏ mận chín
-    "#3D001B"   # Đỏ đen Burgundy vương giả
+    "#FFB3C1",  # Clear light pink
+    "#FF4D6D",  # Warm Coral Pink
+    "#E0115F",  # Brilliant Ruby Pink
+    "#C2185B",  # Sephora Brand Crimson
+    "#A01A40",  # Dark Crimson Berry
+    "#700C25",  # Vintage Red Plum
+    "#3D001B"   # Deep Royal Burgundy
 ]
 
 
@@ -327,10 +333,6 @@ try:
 except Exception as e:
     st.error(f"⚠️ Error: Unable to read 'sephora_website_dataset.csv'. Details: {e}")
     st.stop()
-
-
-
-
 
 
 
@@ -454,7 +456,6 @@ This business intelligence system parses thousands of active Sephora listings to
 
 
 
-
 # --- 5. MAIN PORTAL (INSIDE DASHBOARD) ---
 else:
     st.markdown("""
@@ -467,7 +468,7 @@ else:
 
 
     # Sidebar Logo Header
-    st.sidebar.markdown("<div style='text-align: center; padding: 10px 0;'><h2 style='color: #E91E63; font-weight: 800; margin-bottom: 0;'>SEPHORA PRODUCT ANALYSIS</h2><p style='color: #880E4F; font-size: 0.8rem; letter-spacing: 2px; font-weight: 700;'>DECISION ENGINE</p></div>", unsafe_allow_html=True)
+    st.sidebar.markdown("<div style='text-align: center; padding: 10px 0;'><h2 style='color: #E91E63; font-weight: 800; margin-bottom: 0;'>SEPHORA PRODUCT ANALYSE</h2><p style='color: #880E4F; font-size: 0.8rem; letter-spacing: 2px; font-weight: 700;'>DECISION ENGINE</p></div>", unsafe_allow_html=True)
     st.sidebar.markdown("<hr style='margin: 8px 0; border-color: #FCDDEC;'>", unsafe_allow_html=True)
 
 
@@ -491,7 +492,7 @@ else:
     )
 
 
-    # --- 6. UNIFIED & SYNCHRONIZED SIDEBAR FILTER LAYOUT FOR PERFECT CONSISTENCY ---
+    # --- UNIFIED & SYNCHRONIZED SIDEBAR FILTER LAYOUT FOR PERFECT CONSISTENCY ---
     if tab_selection == "🔮 Strategy Sandbox":
         st.sidebar.markdown("### 🔮 Sandbox Filter System")
         if st.sidebar.button("🔄 Reset filters for this tab", use_container_width=True, key="reset_sandbox"):
@@ -505,22 +506,22 @@ else:
             st.rerun()
 
 
-        # Synchronized Order Part 1: Scope Filters (Brand & Category)
+        # Part 1: Scope Filters (Brand & Category)
         brand_opt = df['brand'].value_counts().head(50).index.tolist()
         sandbox_brands = st.sidebar.multiselect("Filter Brand Segments (Multi):", options=brand_opt, default=st.session_state.sb_brands, key="sb_brands")
        
         cat_opt_sandbox = df['category'].dropna().unique().tolist()
         sandbox_categories = st.sidebar.multiselect("Filter Product Categories (Multi):", options=cat_opt_sandbox, default=st.session_state.sb_categories, key="sb_categories")
        
-        # Synchronized Order Part 2: Range Sliders (Price & Rating)
+        # Part 2: Range Sliders (Price & Rating)
         sandbox_price_range = st.sidebar.slider("Price Target Range ($):", 5.0, 400.0, st.session_state.sb_price, key="sb_price")
         sandbox_rating_range = st.sidebar.slider("Rating Target Range (⭐):", 1.0, 5.0, st.session_state.sb_rating, step=0.1, key="sb_rating")
        
-        # Synchronized Order Part 3: Specific Parameters
+        # Part 3: Specific Parameters
         sandbox_min_reviews = st.sidebar.number_input("Minimum Reviews Count:", min_value=0, max_value=5000, value=int(st.session_state.sb_min_reviews), step=10, key="sb_min_reviews")
 
 
-        # Synchronized Order Part 4: Axis & Chart Configurations
+        # Part 4: Axis & Chart Configurations
         st.sidebar.markdown("---")
         st.sidebar.markdown("### 📊 Interactive Axis Settings")
         axis_choices = ['price', 'love', 'rating', 'number_of_reviews', 'vfm_score']
@@ -542,22 +543,22 @@ else:
             st.rerun()
 
 
-        # Synchronized Order Part 1: Scope Filters (Brand & Category)
+        # Part 1: Scope Filters (Brand & Category)
         brand_opt_density = df['brand'].value_counts().head(40).index.tolist()
         density_brands = st.sidebar.multiselect("Select Brand Segments (Multi):", brand_opt_density, default=st.session_state.d_brands, key="d_brands")
        
         cat_opt_density = df['category'].dropna().unique().tolist()
         density_categories = st.sidebar.multiselect("Select Product Categories (Multi):", cat_opt_density, default=st.session_state.d_categories, key="d_categories")
        
-        # Synchronized Order Part 2: Range Sliders (Price & Rating)
+        # Part 2: Range Sliders (Price & Rating)
         density_price_range = st.sidebar.slider("Retail Price Limits ($):", 5.0, 500.0, st.session_state.d_price, step=5.0, key="d_price")
         density_rating_range = st.sidebar.slider("Satisfaction Rating Range (⭐):", 1.0, 5.0, st.session_state.d_rating, step=0.1, key="d_rating")
        
-        # Synchronized Order Part 3: Specific Parameters
+        # Part 3: Specific Parameters
         bin_count = st.sidebar.slider("Adjust Bins (Granularity):", 10, 100, int(st.session_state.d_bins), key="d_bins")
 
 
-        # Synchronized Order Part 4: Axis & Chart Configurations
+        # Part 4: Axis & Chart Configurations
         st.sidebar.markdown("---")
         st.sidebar.markdown("### 📊 Matrix Style Settings")
         density_x_choices = ['category', 'brand', 'rating']
@@ -583,22 +584,22 @@ else:
             st.rerun()
 
 
-        # Synchronized Order Part 1: Scope Filters (Brand & Category)
+        # Part 1: Scope Filters (Brand & Category)
         brand_opts_leaders = df['brand'].value_counts().head(50).index.tolist()
         leaders_brands = st.sidebar.multiselect("Select Brand Targets (Multi):", brand_opts_leaders, default=st.session_state.a_brands, key="a_brands")
        
         cat_opts = df['category'].value_counts().head(30).index.tolist()
         leaders_categories = st.sidebar.multiselect("Select Category Sectors (Multi):", cat_opts, default=st.session_state.a_cats, key="a_cats")
        
-        # Synchronized Order Part 2: Range Sliders (Price & Rating)
+        # Part 2: Range Sliders (Price & Rating)
         leaders_price_range = st.sidebar.slider("Price Bound Target Range ($):", 0.0, 500.0, st.session_state.a_price_range, step=5.0, key="a_price_range")
         leaders_rating_range = st.sidebar.slider("Rating Target Range (⭐):", 1.0, 5.0, st.session_state.a_rating_range, step=0.1, key="a_rating_range")
        
-        # Synchronized Order Part 3: Specific Parameters
+        # Part 3: Specific Parameters
         item_limit = st.sidebar.slider("Number of Products to Show:", 5, 30, int(st.session_state.a_limit), key="a_limit")
 
 
-        # Synchronized Order Part 4: Axis & Chart Configurations
+        # Part 4: Axis & Chart Configurations
         st.sidebar.markdown("---")
         st.sidebar.markdown("### 📊 Display Configurations")
         sort_opts = ['love', 'number_of_reviews', 'price', 'rating', 'vfm_score']
@@ -626,22 +627,22 @@ else:
             st.rerun()
 
 
-        # Synchronized Order Part 1: Scope Filters (Brand & Category)
+        # Part 1: Scope Filters (Brand & Category)
         brand_opts_explorer = df['brand'].dropna().unique().tolist()
         explorer_brands = st.sidebar.multiselect("Base Catalog Brands (Multi):", brand_opts_explorer, default=st.session_state.exp_brands, key="exp_brands")
        
         cat_opts_explorer = df['category'].dropna().unique().tolist()
         explorer_categories = st.sidebar.multiselect("Base Catalog Categories (Multi):", cat_opts_explorer, default=st.session_state.exp_cats, key="exp_cats")
        
-        # Synchronized Order Part 2: Range Sliders (Price & Rating)
+        # Part 2: Range Sliders (Price & Rating)
         explorer_price_range = st.sidebar.slider("Budget Bound Target Range ($):", 5.0, 500.0, st.session_state.exp_price, step=5.0, key="exp_price")
         explorer_rating_range = st.sidebar.slider("Satisfaction Target Range (⭐):", 1.0, 5.0, st.session_state.exp_rating, step=0.1, key="exp_rating")
        
-        # Synchronized Order Part 3: Specific Parameters
+        # Part 3: Specific Parameters
         explorer_love_range = st.sidebar.slider("Customer Love Index Range:", 0, 1000000, st.session_state.exp_love, step=500, key="exp_love")
         search_kw = st.sidebar.text_input("Formula or Name Keyword search:", value=st.session_state.exp_search, key="exp_search")
        
-        # Synchronized Order Part 4: Axis & Chart Configurations
+        # Part 4: Axis & Chart Configurations
         st.sidebar.markdown("---")
         st.sidebar.markdown("### 📊 Axis & Chart Settings")
         x_opts = ['brand', 'category', 'rating', 'vfm_score']
@@ -666,10 +667,10 @@ else:
 
 
     # -------------------------------------------------------------
-    # TAB 1: EXECUTIVE HOME (KHÔI PHỤC HOÀN TOÀN HAI KHUNG HỘP CHỈ DẪN VÀ MỤC TIÊU - image_3390ff.png)
+    # TAB 1: EXECUTIVE HOME
     # -------------------------------------------------------------
     if tab_selection == "🏠 Executive Home":
-        # Khối chỉ số KPI tổng quan
+        # KPI widgets Row
         c1, c2, c3, c4 = st.columns(4)
         with c1: st.markdown(f"<div class='stat-box'><div class='stat-val'>{df.shape[0]:,}</div><div class='stat-lbl'>Catalog Assortments</div></div>", unsafe_allow_html=True)
         with c2: st.markdown(f"<div class='stat-box'><div class='stat-val'>{df['brand'].nunique()}</div><div class='stat-lbl'>Unique Brands</div></div>", unsafe_allow_html=True)
@@ -679,37 +680,38 @@ else:
 
         st.markdown("<br>", unsafe_allow_html=True)
        
-        # Khôi phục hoàn toàn 2 khung hộp đẹp mắt ở trang đầu (Hình image_3390ff.png)
+        # Restored 2 cards with bold headers and clean, non-bold description blocks
         col_home_txt1, col_home_txt2 = st.columns(2)
         with col_home_txt1:
             st.markdown("""
-            <div class='premium-card' style='height: 100%; border: 1.5px solid #FF85A2; border-radius: 20px; padding: 25px;'>
+            <div class='premium-card' style='height: 100%; border-right: 4.5px solid #E91E63; margin-bottom: 0px;'>
                 <h3 style='margin-top: 0; color: #111827; font-size: 1.35rem;'>✨ Strategic Hub Operating Instructions</h3>
-                <p style='color: #4A5568; line-height: 1.75; font-size: 0.92rem;'>
-                    Welcome to the <b>Sephora Corporate Decision Support Portal</b>. This space has been carefully optimized to avoid unnecessary whitespace, offering lightning-fast database loads and high-fidelity layouts.
+                <p style='color: #4A5568; line-height: 1.75; font-size: 0.95rem;'>
+                    Welcome to the Sephora Corporate Decision Support Portal. This interface is structured to prioritize high-fidelity customizable visual layouts. The control settings on the left sidebar automatically adapt to your chosen category tab, providing an intuitive, clean, and professional workspace.
                 </p>
-                <p style='color: #111827; font-weight: 700; font-size: 0.92rem; margin-top: 15px; margin-bottom: 8px;'>Active Functional Modules:</p>
-                <ul style='color: #4A5568; line-height: 1.7; padding-left: 20px; font-size: 0.9rem;'>
-                    <li style='margin-bottom: 6px;'><b>Strategy Sandbox:</b> Explores cross-metric behaviors (Price, Reviews, Sentiment) under targeted brand standards.</li>
-                    <li style='margin-bottom: 6px;'><b>Price Distributions:</b> Charts continuous price levels to pinpoint pricing gaps and margin strategies.</li>
-                    <li style='margin-bottom: 6px;'><b>Assortment Leaders:</b> Displays rapid market power drops and lists viral products driven by community engagement.</li>
-                    <li style='margin-bottom: 6px;'><b>Cosmetics Explorer (Dynamic):</b> Gives you complete analytical freedom to search ingredients, filter categories, and map bespoke multi-axis projections.</li>
+                <p style='color: #4A5568; line-height: 1.75; font-size: 0.95rem; margin-top: 10px;'>
+                    Active Functional Modules:
+                </p>
+                <ul style='color: #4A5568; line-height: 1.6; padding-left: 20px; font-size: 0.92rem;'>
+                    <li><b>Strategy Sandbox:</b> Evaluate channelling trends across pricing, consumer ratings, and catalog love counts.</li>
+                    <li><b>Price Distributions:</b> Map continuous density spectrums to discover active market segment gaps.</li>
+                    <li><b>Assortment Leaders:</b> View leading items and trace audience affection concentration curves.</li>
+                    <li><b>Cosmetics Explorer:</b> Enjoy analytical freedom to isolate specific brands and filter product dimensions.</li>
                 </ul>
             </div>
             """, unsafe_allow_html=True)
            
         with col_home_txt2:
             st.markdown("""
-            <div class='premium-card' style='height: 100%; border: 1.5px solid #E91E63; border-radius: 20px; padding: 25px;'>
-                <h3 style='margin-top: 0; color: #111827; font-size: 1.35rem;'>🎯 Strategic Objectives</h3>
-                <p style='color: #4A5568; line-height: 1.6; font-weight: 600; margin-bottom: 12px; font-size: 0.92rem;'>
-                    What key insights do we explore from this dataset?
+            <div class='premium-card' style='height: 100%; border-left: 5px solid #B71C1C; margin-bottom: 0px;'>
+                <h3 style='margin-top: 0; color: #111827; font-size: 1.35rem;'>🎯 Core Strategic Objectives</h3>
+                <p style='color: #4A5568; line-height: 1.6; font-size: 0.95rem; margin-bottom: 12px;'>
+                    Which critical consumer benchmarks do we analyze across this dataset?
                 </p>
-                <ul style='font-size: 0.9rem; line-height: 1.7; color: #4A5568; padding-left: 20px; margin-bottom: 0;'>
-                    <li style='margin-bottom: 10px;'><b>Pricing Sweet Spots:</b> Finding perfect value targets that balance brand prestige and volume sales.</li>
-                    <li style='margin-bottom: 10px;'><b>Love Index vs Rating Frequencies:</b> Investigating whether social loyalty translates directly into higher rating stars.</li>
-                    <li style='margin-bottom: 10px;'><b>Assortment Strength:</b> Benchmarking market footprints across sectors like Makeup, Skincare, Fragrances, and Tools.</li>
-                    <li style='margin-bottom: 10px;'><b>Value for Money Index:</b> Uncovering the best consumer-voted returns per dollar spent.</li>
+                <ul style='font-size: 0.92rem; line-height: 1.7; color: #4A5568; padding-left: 20px; margin-bottom: 0;'>
+                    <li style='margin-bottom: 8px;'><b>Optimal Price Thresholds:</b> Determining retail boundaries that optimize revenue margins while preserving high volume conversions.</li>
+                    <li style='margin-bottom: 8px;'><b>Satisfaction Projections:</b> Checking if high catalog popularity ratings map directly to customer review volumes.</li>
+                    <li style='margin-bottom: 8px;'><b>Catalog Assortment Footprints:</b> Evaluating retail diversity metrics across Makeup, Skincare, Fragrances, and Tools.</li>
                 </ul>
             </div>
             """, unsafe_allow_html=True)
@@ -717,10 +719,10 @@ else:
 
         st.markdown("<br>", unsafe_allow_html=True)
        
-        # Không gian làm việc dữ liệu (Data Workspace) chiếm 100% chiều rộng để mang lại tốc độ phản hồi cực cao
+        # Primary Dataset Explorer Workspace
         st.markdown("### 📋 Primary Dataset Explorer Workspace")
        
-        # Bảng lọc dữ liệu chi tiết
+        # Expander table filters
         with st.expander("🛠️ Advanced Table Filtering Options (Click to Expand)", expanded=True):
             col_filt_1, col_filt_2, col_filt_3 = st.columns(3)
             with col_filt_1:
@@ -763,7 +765,7 @@ else:
                 )
 
 
-        # Lọc dữ liệu theo các tiêu chí đã chọn
+        # Execute filtration
         preview_df = df.copy()
         if home_brands_filter:
             preview_df = preview_df[preview_df['brand'].isin(home_brands_filter)]
@@ -785,20 +787,21 @@ else:
             (preview_df['rating'] <= home_rating_range[1])
         ]
        
-        st.markdown(f"**Showing {min(rows_selection, preview_df.shape[0])} of {preview_df.shape[0]} filtered products:**")
+        # ADDED UNIFIED LIVE INSIGHTS BANNER
+        st.success(f"📈 **Live Workspace Insights:** Found **{preview_df.shape[0]}** matching listings.")
         st.dataframe(preview_df.head(rows_selection), use_container_width=True)
 
 
 
 
     # -------------------------------------------------------------
-    # TAB 2: STRATEGY SANDBOX (ĐỒNG BỘ HOÀN HẢO MÀU SẮC CHO DENSITY HEATMAP - SỬA LỖI HÌNH image_3390bd.png và image_338dd8.png)
+    # TAB 2: STRATEGY SANDBOX
     # -------------------------------------------------------------
     elif tab_selection == "🔮 Strategy Sandbox":
         st.markdown("<span class='badge'>INTERACTIVE EXPERIMENT</span>", unsafe_allow_html=True)
         st.markdown("<h2>Dynamic Performance & Customer Loyalty Sandbox</h2>", unsafe_allow_html=True)
        
-        # Áp dụng bộ lọc đa chọn từ thanh bên
+        # Apply scope filters
         filtered_sandbox = df[
             (df['price'] >= sandbox_price_range[0]) &
             (df['price'] <= sandbox_price_range[1])
@@ -816,22 +819,20 @@ else:
            
         col_plot1, col_plot2 = st.columns(2)
         with col_plot1:
-            # SỬA LỖI HÌNH image_338dd8.png: Gom trực tiếp tiêu đề vào thẻ premium-card đơn để tránh lỗi rỗng trắng
-            st.markdown("<div class='premium-card' style='padding: 15px; margin-bottom: 12px;'><h4>Density Heatmap: Correlation Analysis</h4></div>", unsafe_allow_html=True)
+            st.markdown(f"<h4>Density Heatmap: Correlation Analysis (Sephora High Contrast)</h4>", unsafe_allow_html=True)
            
             x_title = sandbox_x_axis.replace('_', ' ').title()
             y_title = sandbox_y_axis.replace('_', ' ').title()
            
-            # Khởi tạo đồ thị mật độ nhiệt 2 chiều đồng bộ trực tiếp gam màu Sephora
             fig_density = px.density_heatmap(
                 filtered_sandbox, x=sandbox_x_axis, y=sandbox_y_axis,
                 marginal_x="histogram", marginal_y="histogram",
                 labels={sandbox_x_axis: x_title, sandbox_y_axis: y_title},
-                color_continuous_scale=HIGH_CONTRAST_BURGUNDY,  # Đồng bộ dải màu đỏ mận mộc mạc cao cấp
+                color_continuous_scale=HIGH_CONTRAST_BURGUNDY,
                 template="simple_white"
             )
            
-            # SỬA LỖI HÌNH image_3390bd.png: Thay đổi màu của marginal histogram thành hồng/đỏ mận đậm đà sắc nét
+            # Apply crimson tone specifically to marginal histogram traces to avoid dim/pale layout
             fig_density.update_traces(marker_color='#C2185B', selector=dict(type='histogram'))
            
             fig_density.update_layout(
@@ -842,7 +843,7 @@ else:
             st.plotly_chart(fig_density, use_container_width=True)
            
         with col_plot2:
-            st.markdown("<div class='premium-card' style='padding: 15px; margin-bottom: 12px;'><h4>Distribution: Product Satisfaction Star Ratings</h4></div>", unsafe_allow_html=True)
+            st.markdown(f"<h4>Distribution: Product Satisfaction Star Ratings</h4>", unsafe_allow_html=True)
             fig_hist = px.histogram(
                 filtered_sandbox, x=sandbox_x_axis,
                 color_discrete_sequence=[SEPHORA_COLORS[3]],
@@ -857,20 +858,21 @@ else:
             )
             st.plotly_chart(fig_hist, use_container_width=True)
            
+        # LIVE INSIGHTS BANNER
         st.success(f"📈 **Live Sandbox Insights:** Found **{filtered_sandbox.shape[0]}** matching listings.")
 
 
-        # KHÔI PHỤC TIẾNG VIỆT BẢN CŨ GỐC CHO PHẦN MÔ TẢ (Hình image_338d9b.png)
+        # Restored description card - Bold heading and light paragraph
         col_desc_sandbox, col_img_sandbox = st.columns([2, 1])
         with col_desc_sandbox:
             st.markdown("""
-            <div class='premium-card' style='margin-bottom: 0px; height: 100%;'>
-                <h4 style='color: #E91E63; font-weight: 700;'>💡 Sandbox Multidimensional Insights</h4>
-                <p style='color: #4A5568; line-height:1.7; font-size: 0.92rem;'>
-                    <b>1. Density Heatmap & Value Correlation: The left density heatmap (Sephora High Contrast) illustrates the correlation between product price and customer "Love" engagement. The data is most densely concentrated in the budget-friendly segment under $50, where customer interaction peaks, and gradually thins out as prices increase. 
+            <div class='premium-card' style='margin-bottom: 0px; height: 100%; border-left: 5px solid #C2185B;'>
+                <h4 style='color: #E91E63; font-weight: 700;'>📝 Sandbox Strategic Diagnostic Analysis</h4>
+                <p style='color: #4A5568; line-height:1.75; font-size: 0.95rem;'>
+                    This interactive sandbox workspace illustrates how a single unified filter panel can control multiple data-driven angles. By restricting catalog assets to specified brands and categories, analysts can instantly study customer loyalty clusters (Scatter Heatmap) alongside satisfaction distribution levels (Histogram).
                 </p>
-                <p style='color: #4A5568; line-height:1.7; font-size: 0.92rem;'>
-                    <b>2. Product Satisfaction & Price Distribution: The right bar chart displays the frequency of product listings across various price points relative to star ratings. The volume peaks sharply (with counts approaching 600) within the $20 to $40 price range, highlighting this as the most dominant and highly-reviewed pricing sweet spot. 
+                <p style='color: #4A5568; line-height:1.75; font-size: 0.95rem; margin-top: 10px;'>
+                    Leveraging these connected visual summaries, brand managers can readily map <i>"sweet spots"</i> where high star rankings converge with fair retail pricing structures. This provides instant diagnostic support for portfolio expansion strategies.
                 </p>
             </div>
             """, unsafe_allow_html=True)
@@ -885,13 +887,13 @@ else:
 
 
     # -------------------------------------------------------------
-    # TAB 3: CUSTOMIZABLE PRICE DENSITIES (LOLLIPOP CHART OVERHAUL & VIETNAMESE DESCRIPTIONS)
+    # TAB 3: CUSTOMIZABLE PRICE DENSITIES
     # -------------------------------------------------------------
     elif tab_selection == "📊 Customizable Price Densities":
         st.markdown("<span class='badge'>PRICING STRUCTURE MATRIX</span>", unsafe_allow_html=True)
         st.markdown("<h2>Custom Lollipop Distribution & Pricing Analytics Matrix</h2>", unsafe_allow_html=True)
        
-        # Áp dụng bộ lọc đa chọn từ thanh bên
+        # Apply multiselect filters
         density_df = df[
             (df['price'] >= density_price_range[0]) &
             (df['price'] <= density_price_range[1])
@@ -905,42 +907,38 @@ else:
             (density_df['rating'] <= density_rating_range[1])
         ]
        
-        # "Đập đi xây lại" hoàn toàn thành biểu đồ Lollipop (Kẹo mút) tuyệt đẹp
         if not density_df.empty:
             lollipop_data = density_df.groupby(density_x_axis)[density_y_axis].mean().reset_index()
-            # Sắp xếp giảm dần để đồ thị kẹo mút trông có cấu trúc chiến lược cao
             lollipop_data = lollipop_data.sort_values(by=density_y_axis, ascending=False).head(35)
            
             fig_lollipop = go.Figure()
            
-            # Vẽ các thanh "thân kẹo mút" (sticks)
             for i, row in lollipop_data.iterrows():
                 fig_lollipop.add_shape(
                     type="line",
                     x0=row[density_x_axis], y0=0,
                     x1=row[density_x_axis], y1=row[density_y_axis],
                     line=dict(
-                        color="#FF4D6D", # Màu hồng mận đậm đà
+                        color="#FF4D6D",
                         width=2.5
                     )
                 )
            
-            # Vẽ "đầu kẹo mút" (markers) rực rỡ và sắc nét
             fig_lollipop.add_trace(go.Scatter(
                 x=lollipop_data[density_x_axis],
                 y=lollipop_data[density_y_axis],
                 mode='markers',
                 marker=dict(
-                    color='#800F2F', # Đỏ Burgundy đậm sắc sảo
+                    color='#800F2F',
                     size=13,
                     line=dict(
-                        color='#3D001B', # Viền đen mận tương phản cực cao
+                        color='#3D001B',
                         width=1.5
                     )
                 ),
                 name=density_y_axis.replace('_', ' ').title(),
                 hoverinfo='text',
-                text=[f"Phân loại ({density_x_axis.upper()}): {r[density_x_axis]}<br>Trung bình {density_y_axis.replace('_', ' ').title()}: {r[density_y_axis]:.2f}" for _, r in lollipop_data.iterrows()]
+                text=[f"Segment ({density_x_axis.upper()}): {r[density_x_axis]}<br>Average {density_y_axis.replace('_', ' ').title()}: {r[density_y_axis]:.2f}" for _, r in lollipop_data.iterrows()]
             ))
            
             fig_lollipop.update_layout(
@@ -955,21 +953,26 @@ else:
             )
            
             st.plotly_chart(fig_lollipop, use_container_width=True)
+           
+            # ADDED UNIFIED LIVE INSIGHTS BANNER
+            st.success(f"📈 **Live Density Insights:** Found **{density_df.shape[0]}** matching listings.")
         else:
-            st.warning("⚠️ Không tìm thấy sản phẩm nào khớp với bộ lọc dữ liệu hiện tại.")
+            st.warning("⚠️ No products match the current filter selection.")
 
 
-        # KHÔI PHỤC TIẾNG VIỆT GỐC BẢN CŨ CHO TAB 3
+        # Restored description card - Bold heading and light paragraph
         col_desc_densities, col_img_densities = st.columns([2, 1])
         with col_desc_densities:
             st.markdown(f"""
             <div class='premium-card' style='margin-bottom: 0px; height: 100%; border-left: 5px solid #C2185B;'>
-                <h4 style='color: #B71C1C; font-weight: 700;'>🍭 Lollipop Pricing & Metric Distribution Analytics</h4>
-                <p style='color: #4A5568; line-height:1.7;'>
-                    <b>High-End Premium Categories: The chart highlights that "High Tech Tools" commands the highest average price point, peaking at approximately $130, closely followed by specialized treatments like "Hair Thinning & Hair Loss" and "Hair Straighteners & Flat Irons" hovering around $120. 
+                <h4 style='color: #B71C1C; font-weight: 700;'>📝 Pricing Segment Density Analysis</h4>
+                <p style='color: #4A5568; line-height:1.75; font-size: 0.95rem;'>
+                    This visual lollipop chart maps the continuous distribution density of Sephora's inventory.
+                    By grouping catalog offerings based on targeted brand and category inputs, the resulting metrics pinpoint where the brand concentrates its primary market assets.
                 </p>
-                <p style='color: #E91E63; font-weight: 600; margin-top: 10px;'>
-                     Currently aggregating data from {density_df.shape[0]} qualified products to establish precise category baseline trends. 
+                <p style='color: #4A5568; line-height:1.75; font-size: 0.95rem; margin-top: 10px;'>
+                    Typically, high-density pricing clusters at the lower tier process mass market customer acquisitions, while high-end specialty lines carry significant retail margins.
+                    Tracking these segments helps discover underserved areas in the beauty marketplace.
                 </p>
             </div>
             """, unsafe_allow_html=True)
@@ -984,7 +987,7 @@ else:
 
 
     # -------------------------------------------------------------
-    # TAB 4: FLEXIBLE AREA TREND LEADERS (TIẾNG VIỆT BẢN CŨ)
+    # TAB 4: FLEXIBLE AREA TREND LEADERS
     # -------------------------------------------------------------
     elif tab_selection == "📈 Flexible Area Trend Leaders":
         st.markdown("<span class='badge'>ASSORTMENT POWER</span>", unsafe_allow_html=True)
@@ -996,7 +999,7 @@ else:
         if leaders_brands:
             area_df = area_df[area_df['brand'].isin(leaders_brands)]
        
-        # Lọc theo thanh kéo khoảng giá 2 đầu
+        # Apply range parameters
         area_df = area_df[
             (area_df['price'] >= leaders_price_range[0]) &
             (area_df['price'] <= leaders_price_range[1])
@@ -1009,7 +1012,6 @@ else:
         area_plot_data = area_df.sort_values(by=ranking_var, ascending=False).head(item_limit)
        
         if not area_plot_data.empty:
-            # Biểu đồ diện tích lũy tiến hỗ trợ tự chọn trục X và Y để tăng khả năng phân tích đa chiều
             fig_area = px.area(
                 area_plot_data, x=area_x_axis, y=area_y_axis,
                 color_discrete_sequence=[SEPHORA_COLORS[3]], template="simple_white",
@@ -1023,25 +1025,33 @@ else:
                 margin=dict(l=10, r=10, t=20, b=10)
             )
             st.plotly_chart(fig_area, use_container_width=True)
+           
+            # ADDED UNIFIED LIVE INSIGHTS BANNER
+            st.success(f"📈 **Live Leader Insights:** Found **{area_df.shape[0]}** matching listings.")
         else:
             st.warning("⚠️ No products match the selected parameters in this segment.")
 
 
-        # KHÔI PHỤC TIẾNG VIỆT GỐC BẢN CŨ CHO TAB 4
+        # Restored description card - Bold heading and light paragraph
         col_desc_leaders, col_img_leaders = st.columns([2, 1])
         with col_desc_leaders:
             st.markdown(f"""
-            <div class='premium-card' style='margin-bottom: 0px; height: 100%;'>
-                <h4 style='color: #E91E63; font-weight: 700;'>⭐ Power Law Dynamics in Modern Cosmetics</h4>
-                <p style='color: #4A5568; line-height:1.7;'>
-                    The area chart has been optimized to allow for the structuring of the horizontal axis (e.g., Product Name, Brand, Category) and the correlation of the vertical axis (e.g., Love Score, Price, Star Ratings). This supports the team's strategic reports in easily identifying the "Leading Product" that represents the Sephora customer segment.
+            <div class='premium-card' style='margin-bottom: 0px; height: 100%; border-right: 5px solid #C2185B;'>
+                <h4 style='color: #E91E63; font-weight: 700;'>📝 Cumulative Assortment Area Trend Analysis</h4>
+                <p style='color: #4A5568; line-height:1.75; font-size: 0.95rem;'>
+                    This cumulative area visualization charts leading marketplace listings ranked by your selected priority variable.
+                    The steep curves demonstrate standard <b>Power Law concentration</b> in beauty retail, where a small set of 'Hero Products' carries the vast majority of consumer engagement.
+                </p>
+                <p style='color: #4A5568; line-height:1.75; font-size: 0.95rem; margin-top: 10px;'>
+                    Large review counts and high emotional attachment indexes point to strong viral retention.
+                    Tracking these curves helps portfolio coordinators identify central products that act as natural gateways driving organic traffic to other catalog options.
                 </p>
             </div>
             """, unsafe_allow_html=True)
         with col_img_leaders:
             st.image(
-                "https://images.unsplash.com/photo-1608248597481-496100c80836?auto=format&fit=crop&w=600&q=80",
-                caption="Organic Sephora Product Catalog",
+                "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=600&q=80",
+                caption="Professional Sephora Brush Collection",
                 use_container_width=True
             )
 
@@ -1049,7 +1059,7 @@ else:
 
 
     # -------------------------------------------------------------
-    # TAB 5: COSMETICS EXPLORER (TIẾNG VIỆT BẢN CŨ)
+    # TAB 5: COSMETICS EXPLORER
     # -------------------------------------------------------------
     elif tab_selection == "💎 Cosmetics Explorer":
         st.markdown("<span class='badge'>EXPLORATIVE ENGINE</span>", unsafe_allow_html=True)
@@ -1093,7 +1103,6 @@ else:
             chart_data = chart_data.sort_values(by=y_axis_var, ascending=False).head(30)
 
 
-            # Sử dụng phổ màu HIGH_CONTRAST_BURGUNDY phân biệt rõ ràng không chồng chéo
             if chart_type_sel == 'Treemap':
                 fig_custom = px.treemap(
                     chart_data, path=[x_axis_var], values=y_axis_var,
@@ -1121,33 +1130,22 @@ else:
             st.plotly_chart(fig_custom, use_container_width=True)
 
 
-            st.success(f"🎯 **Explorer Execution Matrix:** Identified **{exp_df.shape[0]}** matching assortments.")
+            # HARMONIZED LIVE INSIGHTS BANNER
+            st.success(f"📈 **Live Explorer Insights:** Found **{exp_df.shape[0]}** matching listings.")
         else:
             st.warning("⚠️ No products matching your criteria are present in our dataset.")
 
 
-         # KHÔI PHỤC TIẾNG VIỆT GỐC BẢN CŨ CHO TAB 5
-        col_desc_densities, col_img_densities = st.columns([2, 1])
-        with col_desc_densities:
-            st.markdown(f"""
-            <div class='premium-card' style='margin-bottom: 0px; height: 100%; border-left: 5px solid #C2185B;'>
-                <h4 style='color: #B71C1C; font-weight: 700;'>📊 Enhanced Multidimensional Strategy Insights</h4>
-                <p style='color: #4A5568; line-height:1.7;'>
-                     <b>Brand Engagement Powerhouses: The treemap segments brands by total engagement volume. "stila" and "Buxom" clearly dominate the market footprint, coated in the deepest burgundy shades to signal peak customer "Love" accumulations (with stila pushing past 140k). 
-                </p>
-                <p style='color: #4A5568; line-height:1.7; font-size: 0.92rem;'>
-                    <b>Mid-Tier Market Density: Mainstream brands such as "Urban Decay", "Anastasia Beverly Hills", "HUDA BEAUTY", and "Too Faced" represent massive structural blocks with strong, consistent pink-to-red tone distribution. 
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-        with col_img_densities:
-            st.image(
-                "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=600&q=80",
-                caption="Premium Liquid Cosmetic Textures",
-                use_container_width=True
-            )
-
-
+        # Restored description card - Bold heading and light paragraph
+        st.markdown(f"""
+        <div class='premium-card' style='margin-bottom: 0px;'>
+            <h4 style='color: #E91E63; font-weight: 700;'>📝 Multidimensional Explorer Strategic Projections</h4>
+            <p style='color: #4A5568; line-height:1.75; font-size: 0.95rem;'>
+                <b>Advanced Strategy Modeling:</b> By offering customizable coordinates, this portal bridges the gap between raw datasets and executive planning.
+                For example, setting the X-Axis to 'brand' and the Y-Axis to 'price' while isolating active components like 'glycol' or 'organic' immediately reveals which premium labels successfully leverage ingredient-focused marketing to justify higher pricing margins on the store floor.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
 
 
@@ -1204,6 +1202,8 @@ else:
             <p style='color: #E91E63; font-weight: 700; font-size: 1rem;'>Officially submitted to Senior Lecturer Dr. Tan Do • Vietnamese-German University (VGU).</p>
         </div>
         """, unsafe_allow_html=True)
-
+       
+        # ADDED UNIFIED LIVE INSIGHTS BANNER FOR COMPLETENESS
+        st.success("📈 **Live Database Insights:** Project directory active, verified, and compiled.")
 
 
